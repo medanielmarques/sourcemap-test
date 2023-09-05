@@ -1,0 +1,14 @@
+name: Upload Sourcemaps to Bugsnag
+
+on: [push]
+
+jobs:
+  upload:
+    name: upload sourcemaps
+      runs-on: ubuntu-latest
+      steps:
+        - name: (Production) Upload sourcemaps to Bugsnag
+          # if: github.event_name != 'pull_request'
+          id: prod_sourcemaps  
+          uses: ./.github/actions/upload-bugsnag-sourcemaps
+          continue-on-error: true

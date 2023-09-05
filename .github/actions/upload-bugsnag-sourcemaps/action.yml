@@ -1,0 +1,31 @@
+name: "Upload source maps to Bugsnag"
+# inputs:
+#   docker-image-id:
+#     description: "ID of the Docker image containing the assets"
+#     required: true
+#   bugsnag-api-key:
+#     description: "Bugsnag API key"
+#     required: true
+#   static-asset-host:
+#     description: "Static asset host"
+#     required: true
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        # Create the container (if it doesn't already exist).
+        # It will only already exist when this action is called multiple times on the same workflow.
+        container=$(docker ps -a -q --filter name=bugsnag_sourcemaps)
+        [[ ! -z "$container" ]] && echo "Container already exists." || docker create --name bugsnag_sourcemaps ${{ inputs.docker-image-id }}
+
+        # Copy the assets from the Docker image
+        rm -rf priv/static/js
+        mkdir -p priv/static
+        docker cp bugsnag_sourcemaps:/opt/app/lib/therealreal-1.0.0/priv/static/js priv/static
+
+        # Uncomment below to see the JS files copied from the image
+        # ls -t priv/static/js
+
+        # Send source maps to Bugsnag
+        STATIC_ASSET_HOST="${{ inputs.static-asset-host }}" BUGSNAG_JS_API_KEY="${{ inputs.bugsnag-api-key }}" ./.github/actions/upload_bugsnag_sourcemaps/upload
+      shell: bash
