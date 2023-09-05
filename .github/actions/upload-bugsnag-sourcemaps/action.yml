@@ -10,7 +10,7 @@ name: "Upload source maps to Bugsnag"
 #     description: "Static asset host"
 #     required: true
 runs:
-  using: "composite"
+  # using: "composite"
   steps:
     - run: |
         # Create the container (if it doesn't already exist).
